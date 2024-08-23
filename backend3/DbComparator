@@ -1,0 +1,65 @@
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * @author YJF
+ */
+
+
+public class DbComparator {
+
+    public CompareResult compare(Db db1, Db db2) {
+        CompareResult result = new CompareResult();
+        // 比较表差异
+        List<TableDiff> tableDiffs = compareTables(db1, db2);
+        result.setTableDiffs(tableDiffs);
+
+        // 比较字段差异
+        List<ColumnDiff> columnDiffs = compareColumns(db1, db2);
+        result.setColumnDiffs(columnDiffs);
+
+        return result;
+    }
+
+    private List<TableDiff> compareTables(Db db1, Db db2) {
+        // TODO: 实现比较表差异的逻辑
+        return null;
+    }
+
+    private List<ColumnDiff> compareColumns(Db db1, Db db2) {
+        // TODO: 实现比较字段差异的逻辑
+        return null;
+    }
+}
+
+@Data
+class Db {
+    private String name;
+    private String url;
+    private String username;
+    private String password;
+}
+
+@Data
+class CompareResult {
+    private List<ColumnDiff> columnDiffs;
+    private List<TableDiff> tableDiffs;
+}
+
+@Data
+class TableDiff {
+    private String name;
+    // 1=表都有并且完全相同, 2=表都有但是存在不同, 3=db1有 && db2没有, 4=db2有 && db1没有
+    private int diff;
+}
+
+@Data
+class ColumnDiff {
+    private String table;
+    private String name;
+    // 1=字段都有并且完全相同, 2=字段都有但是存在不同, 3=db1有 && db2没有, 4=db2有 && db1没有
+    // 字段不同指：字段类型不同、字段长度不同、字段是否为空不同、字段默认值不同、
+    // 字段是否为主键不同、字段是否自增不同
+    private int diff;
+}
