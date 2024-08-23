@@ -1,0 +1,46 @@
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * @author YJF
+ *
+ */
+@RestController
+public class UserController {
+    @Role(value = Role.GUEST)
+    @PostMapping("/api/login")
+    public ResponseEntity<Void> login(@RequestParam String username, @RequestParam String password, HttpSession session) {
+
+        // 假设登录成功，设置用户角色为USER
+        session.setAttribute("role", Role.USER);
+        return ResponseEntity.ok().build();
+    }
+
+    @Role(value = Role.USER)
+    @GetMapping("/api/user")
+    public ResponseEntity<Void> getUser(@RequestParam String id, HttpSession session) {
+        // 检查用户角色是否为USER，如果不是则抛出权限拒绝异常
+        if (session.getAttribute("role") == null || (int) session.getAttribute("role") != Role.USER) {
+            throw new PermissionDeniedException("非用户");
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @Role(value = Role.ADMIN)
+    @DeleteMapping("/api/user")
+    public ResponseEntity<Void> deleteUser(@RequestParam String id, HttpSession session) {
+        // 检查用户角色是否为ADMIN，如果不是则抛出权限拒绝异常
+        if (session.getAttribute("role") == null || (int) session.getAttribute("role") != Role.ADMIN) {
+            throw new PermissionDeniedException("Permission denied");
+        }
+        return ResponseEntity.ok().build();
+    }
+        @ResponseStatus(HttpStatus.FORBIDDEN)
+        public class PermissionDeniedException extends RuntimeException {
+            public PermissionDeniedException(String message) {
+                super(message);
+            }
+        }
+    }
